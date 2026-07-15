@@ -1,0 +1,43 @@
+{
+  "name": "@forjio/storlaunch-cli",
+  "version": "0.15.1",
+  "description": "Storlaunch CLI \u2014 seller tools (storefronts, inventory, shipping, ledger, reports, payouts, discount-codes, payments, webhooks) and buyer tools (shop, cart, orders, subs, invoices) in one CLI",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "storlaunch": "bin/storlaunch.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run --exclude src/__tests__/e2e/**",
+    "test:watch": "vitest --exclude src/__tests__/e2e/**",
+    "test:e2e": "BACKEND_URL=https://storlaunch.forjio.com/api/v1 vitest run src/__tests__/e2e/",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hachimi-cat/storlaunch-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hachimi-cat/storlaunch-cli/issues"
+  },
+  "homepage": "https://github.com/hachimi-cat/storlaunch-cli#readme"
+}
