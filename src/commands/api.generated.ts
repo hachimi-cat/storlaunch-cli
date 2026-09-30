@@ -4426,9 +4426,15 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "areas",
     "method": "GET",
     "path": "/api/v1/shipping/areas",
-    "summary": "List areas",
+    "summary": "Area search (the Biteship area ids an origin/rates call takes) lives in fulkruma.",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "q",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
