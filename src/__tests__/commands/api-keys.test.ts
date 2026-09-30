@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Command } from "commander";
 
-vi.mock("../../lib/api.js", () => {
+vi.mock("../../lib/api.js", async (importOriginal) => {
+  // The real URL joining (apiUrl); only the network call is mocked.
+  const { apiUrl } = await importOriginal<typeof import("../../lib/api.js")>();
   class ApiClientError extends Error {
     status: number;
     code?: string;
@@ -12,7 +14,7 @@ vi.mock("../../lib/api.js", () => {
       this.code = e.code;
     }
   }
-  return { apiRequest: vi.fn(), ApiClientError };
+  return { apiRequest: vi.fn(), apiUrl, ApiClientError };
 });
 
 vi.mock("../../lib/config.js", () => ({
@@ -21,7 +23,7 @@ vi.mock("../../lib/config.js", () => ({
   getConfig: vi.fn(() => ({ api_url: "https://api.test/v1", token: "sk_live_test" })),
   getConfigPath: vi.fn(() => "/tmp/.storlaunch/config.json"),
   resolveApiKey: vi.fn(() => "sk_live_test"),
-  resolveApiUrl: vi.fn(() => "https://api.test/v1"),
+  resolveApiUrl: vi.fn(() => "https://api.test/api/v1"),
 }));
 
 import { apiRequest } from "../../lib/api.js";
@@ -90,15 +92,15 @@ describe("api-keys commands", () => {
   });
 
   describe("revoke", () => {
-    it("calls POST /account/api-keys/:id/revoke", async () => {
-      vi.mocked(apiRequest).mockResolvedValue({ revoked: true });
+    it("calls DELETE /account/api-keys/:id", async () => {
+      vi.mocked(apiRequest).mockResolvedValue(undefined);
 
       const program = createProgram();
       await program.parseAsync(["node", "storlaunch", "api-keys", "revoke", "key_abc"]);
 
       expect(apiRequest).toHaveBeenCalledWith(
-        "/account/api-keys/key_abc/revoke",
-        expect.objectContaining({ method: "POST" })
+        "/account/api-keys/key_abc",
+        expect.objectContaining({ method: "DELETE" })
       );
     });
   });

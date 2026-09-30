@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import chalk from "chalk";
-import { apiRequest, ApiClientError } from "../lib/api.js";
+import { apiRequest, apiUrl, ApiClientError } from "../lib/api.js";
 import { output, type Column } from "../lib/output.js";
 
 /**
@@ -214,12 +214,7 @@ discountCodes
   .action(async (opts, cmd: Command) => {
     const g = cmd.optsWithGlobals<{ json?: boolean; sandbox?: boolean }>();
     try {
-      const { resolveApiUrl } = await import("../lib/config.js");
-      const baseUrl = resolveApiUrl();
-      const url = new URL(
-        `/storefront/public/validate-discount`,
-        baseUrl.endsWith("/") ? baseUrl : baseUrl + "/"
-      );
+      const url = apiUrl("/storefront/public/validate-discount");
       const body: Record<string, unknown> = {
         merchantSlug: opts.merchant,
         code: opts.code,

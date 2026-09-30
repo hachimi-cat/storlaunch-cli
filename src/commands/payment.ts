@@ -2,7 +2,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { apiRequest, ApiClientError } from "../lib/api.js";
+import { apiRequest, apiUrl, ApiClientError } from "../lib/api.js";
 import { output, type Column } from "../lib/output.js";
 
 function getExitCode(err: unknown): number {
@@ -538,10 +538,9 @@ invoices
       const outputPath = opts.output ?? `./${invoice["number"] ?? id}.pdf`;
 
       // Download the PDF
-      const { resolveApiKey, resolveApiUrl } = await import("../lib/config.js");
+      const { resolveApiKey } = await import("../lib/config.js");
       const token = resolveApiKey({ sandbox: g.sandbox });
-      const baseUrl = resolveApiUrl();
-      const url = `${baseUrl.replace(/\/$/, "")}/payment/invoices/${id}/pdf`;
+      const url = apiUrl(`/payment/invoices/${id}/pdf`).toString();
 
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },

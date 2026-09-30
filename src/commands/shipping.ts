@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import chalk from "chalk";
-import { apiRequest, ApiClientError } from "../lib/api.js";
-import { resolveApiUrl } from "../lib/config.js";
+import { apiRequest, apiUrl, ApiClientError } from "../lib/api.js";
 import { output, type Column } from "../lib/output.js";
 
 /**
@@ -116,8 +115,7 @@ couriers
   .action(async (_opts, cmd: Command) => {
     const g = cmd.optsWithGlobals<{ json?: boolean; sandbox?: boolean }>();
     try {
-      const baseUrl = resolveApiUrl();
-      const url = new URL("/shipping/couriers", baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
+      const url = apiUrl("/shipping/couriers");
       const response = await fetch(url.toString(), { headers: { Accept: "application/json" } });
       if (!response.ok) {
         let errorBody: { message?: string; code?: string } = {};
@@ -299,11 +297,7 @@ shipping
   .action(async (waybill: string, opts, cmd: Command) => {
     const g = cmd.optsWithGlobals<{ json?: boolean; sandbox?: boolean }>();
     try {
-      const baseUrl = resolveApiUrl();
-      const url = new URL(
-        `/shipping/track/${encodeURIComponent(waybill)}`,
-        baseUrl.endsWith("/") ? baseUrl : baseUrl + "/"
-      );
+      const url = apiUrl(`/shipping/track/${encodeURIComponent(waybill)}`);
       if (opts.courier) url.searchParams.set("courier", opts.courier);
 
       const response = await fetch(url.toString(), { headers: { Accept: "application/json" } });

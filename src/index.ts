@@ -17,9 +17,12 @@ program
 
 import { sell } from "./commands/sell.js";
 import { buy } from "./commands/buy.js";
+import { buildApiCommand } from "./commands/api.generated.js";
 
 program.addCommand(sell);
 program.addCommand(buy);
+// Every route of the API, one command each (generated from the API spec: scripts/apigen.sh)
+program.addCommand(buildApiCommand());
 
 // ─── Parse ───────────────────────────────────────────────────
 

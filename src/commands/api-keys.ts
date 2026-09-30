@@ -80,8 +80,8 @@ apiKeys
   .action(async (id: string, _, cmd: Command) => {
     const g = cmd.optsWithGlobals<{ json?: boolean; sandbox?: boolean }>();
     try {
-      const result = await apiRequest<Record<string, unknown>>(`/account/api-keys/${id}/revoke`, {
-        method: "POST",
+      const result = await apiRequest<Record<string, unknown>>(`/account/api-keys/${encodeURIComponent(id)}`, {
+        method: "DELETE",
         sandbox: g.sandbox,
       });
 

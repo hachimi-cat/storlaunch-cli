@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { writeFileSync } from "node:fs";
-import { apiRequest, ApiClientError } from "../lib/api.js";
-import { resolveApiKey, resolveApiUrl } from "../lib/config.js";
+import { apiRequest, apiUrl, ApiClientError } from "../lib/api.js";
+import { resolveApiKey } from "../lib/config.js";
 import { output } from "../lib/output.js";
 
 /**
@@ -131,8 +131,7 @@ reports
           code: "AUTH_REQUIRED",
         });
       }
-      const baseUrl = resolveApiUrl();
-      const url = new URL("/reports/ledger.csv", baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
+      const url = apiUrl("/reports/ledger.csv");
       url.searchParams.set("from", opts.from);
       url.searchParams.set("to", opts.to);
       if (opts.currency) url.searchParams.set("currency", opts.currency);

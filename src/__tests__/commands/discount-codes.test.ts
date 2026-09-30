@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Command } from "commander";
 
-vi.mock("../../lib/api.js", () => {
+vi.mock("../../lib/api.js", async (importOriginal) => {
+  // The real URL joining (apiUrl); only the network call is mocked.
+  const { apiUrl } = await importOriginal<typeof import("../../lib/api.js")>();
   class ApiClientError extends Error {
     status: number;
     code?: string;
@@ -12,12 +14,12 @@ vi.mock("../../lib/api.js", () => {
       this.code = e.code;
     }
   }
-  return { apiRequest: vi.fn(), ApiClientError };
+  return { apiRequest: vi.fn(), apiUrl, ApiClientError };
 });
 
 vi.mock("../../lib/config.js", () => ({
   resolveApiKey: vi.fn(() => "sk_live_test"),
-  resolveApiUrl: vi.fn(() => "https://api.test/v1"),
+  resolveApiUrl: vi.fn(() => "https://api.test/api/v1"),
 }));
 
 import { apiRequest } from "../../lib/api.js";

@@ -1,6 +1,6 @@
 {
   "name": "@forjio/storlaunch-cli",
-  "version": "0.15.1",
+  "version": "0.15.3",
   "description": "Storlaunch CLI \u2014 seller tools (storefronts, inventory, shipping, ledger, reports, payouts, discount-codes, payments, webhooks) and buyer tools (shop, cart, orders, subs, invoices) in one CLI",
   "type": "module",
   "main": "dist/index.js",

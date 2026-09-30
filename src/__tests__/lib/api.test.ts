@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Mock config module
 vi.mock("../../lib/config.js", () => ({
   resolveApiKey: vi.fn(() => "sk_live_testkey123"),
-  resolveApiUrl: vi.fn(() => "https://api.test.local/v1"),
+  resolveApiUrl: vi.fn(() => "https://api.test.local/api/v1"),
 }));
 
-import { apiRequest, ApiClientError } from "../../lib/api.js";
+import { apiRequest, apiUrl, ApiClientError } from "../../lib/api.js";
 import { resolveApiKey, resolveApiUrl } from "../../lib/config.js";
 
 describe("apiRequest", () => {
@@ -15,7 +15,7 @@ describe("apiRequest", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", mockFetch);
     vi.mocked(resolveApiKey).mockReturnValue("sk_live_testkey123");
-    vi.mocked(resolveApiUrl).mockReturnValue("https://api.test.local/v1");
+    vi.mocked(resolveApiUrl).mockReturnValue("https://api.test.local/api/v1");
   });
 
   afterEach(() => {
@@ -159,5 +159,52 @@ describe("apiRequest", () => {
 
     await apiRequest("/account", { sandbox: true });
     expect(resolveApiKey).toHaveBeenCalledWith({ sandbox: true });
+  });
+});
+
+// The API URL is the API root. `new URL("/discount-codes", root)` used to drop the
+// root's /api/v1, so every hand-written command landed on the website instead.
+describe("apiUrl", () => {
+  const root = "https://storlaunch.forjio.com/api/v1";
+
+  it("keeps the API root's /api/v1 for a hand-written path", () => {
+    expect(apiUrl("/discount-codes", root).toString()).toBe("https://storlaunch.forjio.com/api/v1/discount-codes");
+    expect(apiUrl("discount-codes", `${root}/`).toString()).toBe("https://storlaunch.forjio.com/api/v1/discount-codes");
+  });
+
+  it("does not double /api/v1 for a generated command's full path", () => {
+    expect(apiUrl("/api/v1/discount-codes/dc_1", root).toString()).toBe("https://storlaunch.forjio.com/api/v1/discount-codes/dc_1");
+  });
+
+  it("adds /api/v1 to an API URL configured as a bare host, and keeps a proxy prefix", () => {
+    expect(apiUrl("/modules", "https://storlaunch.test").toString()).toBe("https://storlaunch.test/api/v1/modules");
+    expect(apiUrl("/modules", "https://proxy.test/storlaunch/api/v1/").toString()).toBe("https://proxy.test/storlaunch/api/v1/modules");
+  });
+
+  it("keeps a query string", () => {
+    expect(apiUrl("/account/blog/posts?status=draft", root).toString()).toBe(`${root}/account/blog/posts?status=draft`);
+  });
+
+  it("is what apiRequest calls, and the envelope's error message is what it throws", async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ data: [] }) })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ data: null, error: { code: "INSUFFICIENT_PERMISSIONS", message: "API keys cannot revoke other API keys." } }),
+      });
+    vi.stubGlobal("fetch", mockFetch);
+    vi.mocked(resolveApiUrl).mockReturnValue(root);
+    try {
+      await apiRequest("/discount-codes", { query: { limit: 5 } });
+      expect(mockFetch.mock.calls[0]![0]).toBe(`${root}/discount-codes?limit=5`);
+      await expect(apiRequest("/account/api-keys/k1", { method: "DELETE" })).rejects.toMatchObject({
+        status: 403,
+        code: "INSUFFICIENT_PERMISSIONS",
+        message: "API keys cannot revoke other API keys.",
+      });
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

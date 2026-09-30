@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { readFileSync } from "node:fs";
-import { apiRequest, ApiClientError } from "../lib/api.js";
+import { apiRequest, apiUrl, ApiClientError } from "../lib/api.js";
 import { output, type Column } from "../lib/output.js";
 
 function getExitCode(err: unknown): number {
@@ -225,10 +225,9 @@ products
   });
 
 async function uploadFile(productId: string, filePath: string, sandbox?: boolean): Promise<void> {
-  const { resolveApiKey, resolveApiUrl } = await import("../lib/config.js");
+  const { resolveApiKey } = await import("../lib/config.js");
   const token = resolveApiKey({ sandbox });
-  const baseUrl = resolveApiUrl();
-  const url = `${baseUrl.replace(/\/$/, "")}/storefront/products/${productId}/files`;
+  const url = apiUrl(`/storefront/products/${productId}/files`).toString();
 
   const fileData = readFileSync(filePath);
   const fileName = filePath.split("/").pop() ?? "file";
@@ -426,9 +425,7 @@ licenses
     const g = cmd.optsWithGlobals<{ json?: boolean; sandbox?: boolean }>();
     try {
       // Public endpoint — uses direct fetch without auth
-      const { resolveApiUrl } = await import("../lib/config.js");
-      const baseUrl = resolveApiUrl();
-      const url = new URL("/storefront/licenses/validate", baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
+      const url = apiUrl("/storefront/licenses/validate");
       url.searchParams.set("key", key);
       if (opts.product) url.searchParams.set("product", opts.product);
 
