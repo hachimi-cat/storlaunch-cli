@@ -107,7 +107,27 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/account/blog/posts",
     "summary": "List posts",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "status",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "draft",
+       "published"
+      ]
+     },
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
@@ -841,7 +861,19 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/analytics/overview",
     "summary": "GET /analytics/overview Response shape is flat to match what the dashboard page reads (frontend/src/app/(dashboard)/dashboard/page.tsx). `recentTransactions` unions paid Invoices (Plugipay-driven) and",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "period",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "7d",
+       "30d",
+       "90d",
+       "12m"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -850,7 +882,29 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/analytics/revenue",
     "summary": "GET /analytics/revenue",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "period",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "7d",
+       "30d",
+       "90d",
+       "12m"
+      ]
+     },
+     {
+      "name": "granularity",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "day",
+       "week",
+       "month"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -859,7 +913,29 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/analytics/subscriptions",
     "summary": "GET /analytics/subscriptions",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "period",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "7d",
+       "30d",
+       "90d",
+       "12m"
+      ]
+     },
+     {
+      "name": "granularity",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "day",
+       "week",
+       "month"
+      ]
+     }
+    ],
     "body": null
    }
   ]
@@ -989,7 +1065,23 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/buyers",
     "summary": "List buyers",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "search",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    }
   ]
@@ -2016,7 +2108,13 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/conversations/embed/products",
     "summary": "List products",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "q",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
@@ -2830,7 +2928,41 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/manual-orders",
     "summary": "List manual orders",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "paymentStatus",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "awaiting_payment",
+       "payment_claimed",
+       "payment_confirmed",
+       "canceled",
+       "refunded"
+      ]
+     },
+     {
+      "name": "fulfillmentStatus",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "preparing",
+       "ready_to_ship",
+       "shipped",
+       "delivered"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -2983,7 +3115,33 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/payment/checkout-sessions",
     "summary": "List checkout sessions",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "status",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "open",
+       "completed",
+       "expired"
+      ]
+     },
+     {
+      "name": "customerId",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
@@ -3304,7 +3462,7 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "create-webhook-endpoints",
     "method": "POST",
     "path": "/api/v1/payment/webhook-endpoints",
-    "summary": "Create a webhook endpoint",
+    "summary": "Register an endpoint.",
     "pathParams": [],
     "query": [],
     "body": [
@@ -3316,11 +3474,16 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
      {
       "name": "events",
       "kind": "array",
-      "required": true
+      "required": false
      },
      {
       "name": "description",
       "kind": "string",
+      "required": false
+     },
+     {
+      "name": "active",
+      "kind": "boolean",
       "required": false
      }
     ]
@@ -3331,7 +3494,23 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/payment/customers",
     "summary": "List customers",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "email",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
@@ -3522,7 +3701,7 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "get-webhook-events",
     "method": "GET",
     "path": "/api/v1/payment/webhook-events/{id}",
-    "summary": "Get a webhook event",
+    "summary": "Get a webhook delivery, with every attempt made at it.",
     "pathParams": [
      "id"
     ],
@@ -3688,7 +3867,40 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/payment/invoices",
     "summary": "List invoices",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "customerId",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "subscriptionId",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "status",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "draft",
+       "open",
+       "paid",
+       "overdue",
+       "void"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -3728,7 +3940,23 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/payment/plans",
     "summary": "List plans",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "active",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    },
    {
@@ -3904,7 +4132,40 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/payment/subscriptions",
     "summary": "List subscriptions",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "customerId",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "planId",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "status",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "trialing",
+       "active",
+       "past_due",
+       "paused",
+       "canceled"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -4032,7 +4293,7 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "update-webhook-endpoints",
     "method": "PATCH",
     "path": "/api/v1/payment/webhook-endpoints/{id}",
-    "summary": "Update a webhook endpoint",
+    "summary": "Update an endpoint. `active: false` pauses it (its queued deliveries become failed); `active: true` re-enables it — also after Storlaunch switched it off for failing — and clears its failure streak.",
     "pathParams": [
      "id"
     ],
@@ -4057,6 +4318,11 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
       "name": "description",
       "kind": "string",
       "required": false
+     },
+     {
+      "name": "rotateSecret",
+      "kind": "boolean",
+      "required": false
      }
     ]
    },
@@ -4064,8 +4330,39 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "webhook-endpoints",
     "method": "GET",
     "path": "/api/v1/payment/webhook-endpoints",
-    "summary": "List webhook endpoints",
+    "summary": "List endpoints, newest first.",
     "pathParams": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     }
+    ],
+    "body": null
+   },
+   {
+    "name": "webhook-endpoints-event-types",
+    "method": "GET",
+    "path": "/api/v1/payment/webhook-endpoints/event-types",
+    "summary": "The event types an endpoint can subscribe to: Storlaunch's own catalogue, and — with the Payment module on — Plugipay's (delivered by Plugipay to the same endpoint).",
+    "pathParams": [],
+    "query": [],
+    "body": null
+   },
+   {
+    "name": "webhook-endpoints-test",
+    "method": "POST",
+    "path": "/api/v1/payment/webhook-endpoints/{id}/test",
+    "summary": "Send a test event.",
+    "pathParams": [
+     "id"
+    ],
     "query": [],
     "body": null
    },
@@ -4073,16 +4370,56 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "name": "webhook-events",
     "method": "GET",
     "path": "/api/v1/payment/webhook-events",
-    "summary": "List webhook events",
+    "summary": "List webhook deliveries, newest first: each with its status (pending, sent, failed), attempt count, next retry, last response and every attempt made.",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "type",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "endpointId",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "status",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "pending",
+       "sent",
+       "failed"
+      ]
+     },
+     {
+      "name": "source",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "storlaunch",
+       "plugipay"
+      ]
+     }
+    ],
     "body": null
    },
    {
     "name": "webhook-events-resend",
     "method": "POST",
     "path": "/api/v1/payment/webhook-events/{id}/resend",
-    "summary": "Resend a webhook event",
+    "summary": "Resend a webhook delivery.",
     "pathParams": [
      "id"
     ],
@@ -4637,7 +4974,90 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "pathParams": [
      "id"
     ],
-    "query": [],
+    "query": [
+     {
+      "name": "size",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "a4",
+       "thermal-80x100",
+       "thermal-100x150"
+      ]
+     },
+     {
+      "name": "showSenderPhone",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showRecipientPhone",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "maskRecipientName",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showShippingCost",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showInsurance",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showItems",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showItemDescriptions",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     },
+     {
+      "name": "showItemSkus",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "true",
+       "false"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -4788,7 +5208,22 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/shipping-credits/quote",
     "summary": "What this rupiah amount of credit costs on a given rail.",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "amount",
+      "kind": "number",
+      "required": true
+     },
+     {
+      "name": "currency",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "IDR",
+       "USD"
+      ]
+     }
+    ],
     "body": null
    },
    {
@@ -4846,7 +5281,23 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/shoppers",
     "summary": "List shoppers",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "search",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     }
+    ],
     "body": null
    }
   ]
@@ -5392,7 +5843,34 @@ export const API_ROUTES: Array<{ area: string; routes: Route[] }> = [
     "path": "/api/v1/storefront/products",
     "summary": "GET /storefront/products",
     "pathParams": [],
-    "query": [],
+    "query": [
+     {
+      "name": "limit",
+      "kind": "number",
+      "required": false
+     },
+     {
+      "name": "cursor",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "published",
+      "kind": "string",
+      "required": false
+     },
+     {
+      "name": "type",
+      "kind": "string",
+      "required": false,
+      "choices": [
+       "digital",
+       "subscription",
+       "physical",
+       "license"
+      ]
+     }
+    ],
     "body": null
    },
    {

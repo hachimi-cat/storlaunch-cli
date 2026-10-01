@@ -132,14 +132,45 @@ describe("webhook commands", () => {
       const program = createProgram();
       await program.parseAsync([
         "node", "storlaunch", "webhook", "events", "list",
-        "--type", "checkout.session.completed", "--status", "sent",
+        "--type", "checkout.session.completed", "--status", "sent", "--endpoint", "we_1",
       ]);
 
       expect(apiRequest).toHaveBeenCalledWith(
         "/payment/webhook-events",
         expect.objectContaining({
-          query: expect.objectContaining({ type: "checkout.session.completed", status: "sent" }),
+          // the API filters on endpointId (it ignored `endpoint`)
+          query: expect.objectContaining({ type: "checkout.session.completed", status: "sent", endpointId: "we_1" }),
         })
+      );
+    });
+  });
+
+  describe("endpoints test / event-types / update --rotate-secret", () => {
+    it("queues a test event", async () => {
+      vi.mocked(apiRequest).mockResolvedValue({ id: "whd_1", eventId: "evt_test_1", status: "pending" });
+      await createProgram().parseAsync(["node", "storlaunch", "webhook", "endpoints", "test", "we_1"]);
+      expect(apiRequest).toHaveBeenCalledWith("/payment/webhook-endpoints/we_1/test", expect.objectContaining({ method: "POST" }));
+    });
+    it("lists the event types", async () => {
+      vi.mocked(apiRequest).mockResolvedValue({ storlaunch: [{ type: "product.purchased", description: "x" }], plugipay: [] });
+      await createProgram().parseAsync(["node", "storlaunch", "webhook", "endpoints", "event-types"]);
+      expect(apiRequest).toHaveBeenCalledWith("/payment/webhook-endpoints/event-types", expect.anything());
+    });
+    it("rotates the secret and prints the new one", async () => {
+      vi.mocked(apiRequest).mockResolvedValue({ id: "we_1", secret: "whsec_new" });
+      await createProgram().parseAsync(["node", "storlaunch", "webhook", "endpoints", "update", "we_1", "--rotate-secret"]);
+      expect(apiRequest).toHaveBeenCalledWith(
+        "/payment/webhook-endpoints/we_1",
+        expect.objectContaining({ method: "PATCH", body: { rotateSecret: true } }),
+      );
+      expect(logSpy.mock.calls.flat().join(" ")).toContain("whsec_new");
+    });
+    it("subscribes to everything when --events is left out", async () => {
+      vi.mocked(apiRequest).mockResolvedValue({ id: "we_1", url: "https://myapp.com/wh", events: ["*"] });
+      await createProgram().parseAsync(["node", "storlaunch", "webhook", "endpoints", "create", "--url", "https://myapp.com/wh"]);
+      expect(apiRequest).toHaveBeenCalledWith(
+        "/payment/webhook-endpoints",
+        expect.objectContaining({ body: expect.objectContaining({ events: ["*"] }) }),
       );
     });
   });
